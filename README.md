@@ -1,2 +1,2 @@
 # movie_ticket_booking_app
- Text based application for simple movie ticket bookings
+ Text based application for simple movie ticket bookings developed by Karel Haapasalo
