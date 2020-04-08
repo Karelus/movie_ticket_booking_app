@@ -1,5 +1,6 @@
 package movieTicketApp;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.io.*;
 
@@ -18,110 +19,145 @@ public class Tickets {
 		boolean isLogged = false;
 		boolean isAdmin = false;
 		boolean isUser = false;
-		String userName = "";
-		int userAge = 0;
+		String moviesFile = "movies.txt";
 		
 		System.out.println("Tervetuloa Verkatehtaan elokuvalippujen varauspalveluun!");
 		
-		// Pyöritetään silmukkaa kunnes käyttäjä on kirjautunut sisään
+		// Pyöritetään silmukkaa kunnes käyttäjä valitsee kummalla kirjautuu
+		System.out.println("Haluatko kirjautua sisään ylläpitäjänä vai normaalikäyttäjänä? (Syötä 1 tai 2): ");
 		while (isLogged == false) {
-			int whichUser = askUser();			
-			if (whichUser == 1) {
-				isAdmin = true;
-				isUser = false;
-				isLogged = true;
-				System.out.println("olet nyt admin");
-			} else if (whichUser == 2) {
-				isUser = true;
-				isAdmin = false;
-				isLogged = true;
-				System.out.println("olet nyt normaalikäyttäjä");
-			}		
+				if (reader.hasNextInt()) {
+					int whichUser = reader.nextInt();		
+					if (whichUser == 1) {
+						isAdmin = true;
+						isLogged = true;
+					}	
+					else if (whichUser == 2) {
+						isUser = true;
+						isLogged = true;
+					}
+					else {
+						System.out.println("Et syöttänyt 1 tai 2!");
+					}
+				} else {
+					break;
+				}
+		}			
+		
+		// Tarkistetaan onko kirjautunut ennen kuin muuta näytetään
+		if (isLogged && isUser) {
+			// Haetaan elokuvien listaus tiedostosta ja tallennetaan muuttujaan
+			System.out.println("Tässä on ohjelmistossa olevat elokuvat");
+			ArrayList<String> movies = new ArrayList<String>();
+			try {
+				movies = getMovies(moviesFile);
+			} catch (IOException e) {
+				System.out.println("error");
+			}
+		
+			// Tulostetaan elokuvalistaus näkyville
+			showMovies(movies);
+					
+			// Kysytään käyttäjää valitsemaan elokuvan
+			boolean chosen = false;
+			int selectedMovie = 0;
+			while (chosen == false) {
+				System.out.println("Valitse elokuva yllä olevista(1, 2, 3): ");
+				if (reader.hasNextInt()) {
+					selectedMovie = (reader.nextInt() -1);
+					chosen = true;
+				} else {
+					System.out.println("Et syöttänyt oikeata valintaa!");
+					break;
+				}
+			}
+			
+			// Kysytään haluaako käyttäjä varata liput
+			if (chosen) {
+				System.out.println("Haluatko varata liput elokuvaan " + movies.get(selectedMovie) + "?(y/n): ");
+				String askConfirmation = reader.nextLine();
+				if (askConfirmation == "y") {
+					System.out.println("liput varattu");
+				} 
+				else if (askConfirmation == "n") {
+					System.out.println("lippuja ei varattu");
+				}
+				else {
+					System.out.println("something went wrong");
+				}
+				
+			}
 		}
 		
-		// Pyydetään käyttäjää syöttämään omia tietoja ja talletetaan ne muuttujiin
-		if (isUser) {
-			System.out.println("Please enter your name: ");
-			userName = reader.nextLine();
-			System.out.println("Syötä myös ikäsi: ");
-			userAge = reader.nextInt();
+		if (isLogged && isAdmin) {
+			System.out.println("Olet admin, tähän tulee myöhemmin lisää");
 		}
 		
-		// Tulostetaan käyttäjälle elokuvat
-		System.out.println("Tässä on ohjelmistossa olevat elokuvat");		
-		try {
-			showMovies();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		
-		
-
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 	/**
-	 * Shows all movies from file "movies.txt"
-	 * @throws FileNotFoundException
+	 * Takes movies arraylist and prints it's content to the user
+	 * @param movies
 	 */
-	private static void showMovies() throws FileNotFoundException {
-		final Scanner fileReader = new Scanner(new File("movies.txt"));
-		String rivi = "";
-		while ( fileReader.hasNext() ) {
-			// luetaan talteen yksi tiedoston rivi
-			rivi = fileReader.nextLine();
-			// tulostetaan näytölle tiedostosta luettu rivi
-			System.out.println(rivi);
-		}	
-		// suljetaan tiedosto
-		fileReader.close();
+	private static void showMovies(ArrayList<String> movies) {
+		for (String movie : movies) {
+			System.out.println(movie);
+		}		
+	}
+
+
+	/**
+	 * Reads lines from textfiles"
+	 * @return ArrayList
+	 * @throws IOException 
+	 */
+	private static ArrayList<String> getMovies(String filename) throws IOException {
+		BufferedReader filereader = new BufferedReader(new FileReader(filename));
+		ArrayList<String> lines = new ArrayList<String>();
+		String line;
+		while ((line = filereader.readLine()) != null) {
+			lines.add(line);
+		}
+		
+		filereader.close();
+		return lines;
 	}
 
 	/**
 	 * Asks the user which user is to be selected for logging
 	 * @return int
 	 */
-	public static int askUser() {
-		System.out.println("Haluatko kirjautua sisään ylläpitäjänä vai normaalikäyttäjänä? (Syötä 1 tai 2): ");
-		if (reader.hasNextInt()) {
-			int whichUser = reader.nextInt();		
-			if (whichUser == 1) {
-				return 1;
-			}		
-			else if (whichUser == 2) {
-				return 2;
-			}
-			else {
-				System.out.println("Et syöttänyt 1 tai 2!");
-			}
-		} else {
-			System.out.println("Et syöttänyt oikeanlaista arvoa!");
-		}
-		return 0;
-	}
 
-	/*private static boolean askAdmin() {
-		String username = "admin";
-		String password = "admin";
-		System.out.println("Syötä käyttäjätunnus: ");
-		String inputtedUsername = reader.nextLine();
-		System.out.println("Syötä salasana: ");
-		String inputtedPassword = reader.nextLine();
-		
-		if (username.equals(inputtedUsername) && password.equals(inputtedPassword)) {
-			return true;
-		} else {
-			System.out.println("Väärät tunnukset!");
-			return false;
-		}
-	}*/
+
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*private static boolean askAdmin() {
+String username = "admin";
+String password = "admin";
+System.out.println("Syötä käyttäjätunnus: ");
+String inputtedUsername = reader.nextLine();
+System.out.println("Syötä salasana: ");
+String inputtedPassword = reader.nextLine();
+
+if (username.equals(inputtedUsername) && password.equals(inputtedPassword)) {
+	return true;
+} else {
+	System.out.println("Väärät tunnukset!");
+	return false;
+}
+}*/
