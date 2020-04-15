@@ -17,57 +17,45 @@ public class Tickets {
 
 		// Muttujien alustus
 		boolean isLogged = false;
-		boolean isAdmin = false;
-		boolean isUser = false;
 		String moviesFile = "movies.txt";
 		
 		System.out.println("Tervetuloa Verkatehtaan elokuvalippujen varauspalveluun!");
 		
-		// Pyöritetään silmukkaa kunnes käyttäjä valitsee kummalla kirjautuu
-		System.out.println("Haluatko kirjautua sisään ylläpitäjänä vai normaalikäyttäjänä? (Syötä 1 tai 2): ");
-		while (isUser == false && isAdmin == false) {
-				if (reader.hasNextInt()) {
-					int whichUser = reader.nextInt();		
-					if (whichUser == 1) {
-						isAdmin = true;
-					}	
-					else if (whichUser == 2) {
-						isUser = true;
-					}
-					else {
-						System.out.println("Et syöttänyt 1 tai 2!");
-					}
-				} else {
-					System.out.println("Something went wrong!");
-					break;
-				}
-		}
-		
-		// Siirrytään uudelle riville nextInt() kutsun jälkeen
-		reader.nextLine();
-		
 		// Kysytään syöttämään käyttäjätunnus ja salasana, sekä ikä
-		if (isUser == true) {
+		if (isLogged == false) {
 			System.out.println("Anna käyttäjätunnus: ");
 			String userName = reader.nextLine();
-			boolean acceptedPassword = false;		
+			
+			/*boolean acceptedPassword = false;	
 			while (acceptedPassword = false); {
 				System.out.println("Syötä salasana: ");
 				String passWord = reader.nextLine();
-				if (isValid(passWord)) {
+				boolean validPassword = isValid(passWord);
+				if (validPassword) {
 					acceptedPassword = true;
+					isLogged = true;
 				}
-			}	
-				System.out.println("Syötä vielä ikäsi: ");
-				int userAge = reader.nextInt();
-				System.out.println(userName);
-				System.out.println(userAge);
+			}*/	
 			
+			String passWord = "";
+			do {
+				System.out.println("Syötä salasana: ");
+				passWord = reader.nextLine();
+			} while (!isValid(passWord));
+			
+			
+			
+			System.out.println("Syötä vielä ikäsi: ");
+			int userAge = reader.nextInt();
+			System.out.println(userName);
+			System.out.println(userAge);
+			isLogged = true;
 		}
 		
 		
 		// Tarkistetaan onko kirjautunut ja millä käyttäjällä ennen kuin muuta näytetään
-		if (isLogged && isUser) {
+		if (isLogged) {
+			
 			// Haetaan elokuvien listaus tiedostosta ja tallennetaan muuttujaan
 			System.out.println("Tässä on ohjelmistossa olevat elokuvat");
 			ArrayList<String> movies = new ArrayList<String>();
@@ -84,7 +72,7 @@ public class Tickets {
 			boolean chosen = false;
 			int selectedMovie = 0;
 			while (chosen == false) {
-				System.out.println("Valitse elokuva yllä olevista(1, 2, 3): ");
+				System.out.println("Pick a movie from above(1, 2, 3): ");
 				if (reader.hasNextInt()) {
 					selectedMovie = (reader.nextInt() -1);
 					chosen = true;
@@ -111,10 +99,6 @@ public class Tickets {
 			}
 		}
 		
-		if (isAdmin) {
-			System.out.println("Olet admin, tähän tulee myöhemmin lisää");
-		}
-		
 	}
 	
 	/**
@@ -125,12 +109,19 @@ public class Tickets {
 	private static boolean isValid(String passWord) {
 		String password = passWord;
 		boolean noWhite = noWhiteSpace(password);
-		if (noWhite) {
+		boolean isOver = isOverEight(password);
+		if (noWhite && isOver) {
 			System.out.println("Salasana hyväksytty!");
 			return true;
 		} else return false;
 	}
 
+	public static boolean isOverEight(String mj) {
+		if (mj.length() < 8) {
+			System.out.println("Password must be over 8 characters!");
+			return false;
+		} else return true;
+	}
 	
 	private static boolean noWhiteSpace(String password) {
 		int whitespaces = 0;
