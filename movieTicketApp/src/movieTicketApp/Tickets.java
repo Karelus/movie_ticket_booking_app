@@ -11,53 +11,42 @@ import java.io.*;
  */
 public class Tickets {
 
-	public static Scanner reader = new Scanner(System.in);
-	
+	public static Scanner reader = new Scanner(System.in);	
 	public static void main(String[] args) {
 
-		// Muttujien alustus
+		// Variable declaration
 		boolean isLogged = false;
+		
 		String moviesFile = "movies.txt";
+		String userName = "";
 		
-		System.out.println("Tervetuloa Verkatehtaan elokuvalippujen varauspalveluun!");
+		int userAge = 0;
+		int[] ageRatings = {13, 13, 16, 13, 8};
 		
-		// Kysytään syöttämään käyttäjätunnus ja salasana, sekä ikä
+		// Welcomes the user
+		System.out.println("Welcome to Verkatehdas movieticket booking service!");
+		
+		// Ask user to input username, password and age
 		if (isLogged == false) {
-			System.out.println("Anna käyttäjätunnus: ");
-			String userName = reader.nextLine();
-			
-			/*boolean acceptedPassword = false;	
-			while (acceptedPassword = false); {
-				System.out.println("Syötä salasana: ");
-				String passWord = reader.nextLine();
-				boolean validPassword = isValid(passWord);
-				if (validPassword) {
-					acceptedPassword = true;
-					isLogged = true;
-				}
-			}*/	
-			
+			System.out.println("Enter username: ");
+			userName = reader.nextLine();		
 			String passWord = "";
 			do {
-				System.out.println("Syötä salasana: ");
+				System.out.println("Enter password: ");
 				passWord = reader.nextLine();
 			} while (!isValid(passWord));
-			
-			
-			
-			System.out.println("Syötä vielä ikäsi: ");
-			int userAge = reader.nextInt();
-			System.out.println(userName);
-			System.out.println(userAge);
+					
+			System.out.println("Please enter your age: ");
+			userAge = reader.nextInt();
 			isLogged = true;
-		}
+		}		
 		
-		
-		// Tarkistetaan onko kirjautunut ja millä käyttäjällä ennen kuin muuta näytetään
+		// Check if user has logged in before going any further
 		if (isLogged) {
 			
-			// Haetaan elokuvien listaus tiedostosta ja tallennetaan muuttujaan
-			System.out.println("Tässä on ohjelmistossa olevat elokuvat");
+			// Get movielisting from a file and save it to a variable
+			System.out.printf("Hello %s, here are the movies currently playing: ", userName);
+			System.out.println();
 			ArrayList<String> movies = new ArrayList<String>();
 			try {
 				movies = getMovies(moviesFile);
@@ -65,41 +54,62 @@ public class Tickets {
 				System.out.println("error");
 			}
 		
-			// Tulostetaan elokuvalistaus näkyville
+			// Print movielist for the user
 			showMovies(movies);
 					
-			// Kysytään käyttäjää valitsemaan elokuvan
+			// Ask user to pick a movie
 			boolean chosen = false;
 			int selectedMovie = 0;
 			while (chosen == false) {
-				System.out.println("Pick a movie from above(1, 2, 3): ");
+				System.out.println("Pick a movie from above(1, 2, 3, 4, 5): ");
 				if (reader.hasNextInt()) {
 					selectedMovie = (reader.nextInt() -1);
+					reader.nextLine();
 					chosen = true;
 				} else {
-					System.out.println("Et syöttänyt oikeata valintaa!");
+					System.out.println("You didn't enter a valid pick!");
+					System.out.println("Please restart the program");
 					break;
 				}
 			}
 			
-			// Kysytään haluaako käyttäjä varata liput
+			// Ask if user wants to book the tickets
 			if (chosen) {
-				System.out.println("Haluatko varata liput elokuvaan " + movies.get(selectedMovie) + "?(y/n): ");
+				System.out.println("Would you like to book tickets for " + movies.get(selectedMovie) + "?(y/n): ");
 				String askConfirmation = reader.nextLine();
-				if (askConfirmation == "y") {
-					System.out.println("liput varattu");
+				System.out.println(askConfirmation);
+				if (askConfirmation.equals("y")) {
+					if (isOldEnough(ageRatings, selectedMovie, userAge)) {
+						System.out.println("tickets booked");
+					} else System.out.printf("You are not old enough,!"
+							+ " Age rating for this movie is %d", ageRatings[selectedMovie]);
 				} 
-				else if (askConfirmation == "n") {
-					System.out.println("lippuja ei varattu");
+				else if (askConfirmation.equals("n")) {
+					System.out.println("tickets not booked");
 				}
 				else {
-					System.out.println("something went wrong");
-				}
-				
-			}
-		}
-		
+					System.out.println("wrong input, restart the program!");
+				}				
+			}						
+		}		
 	}
+
+	/**
+	 * checks user age and compares it to movies age rating
+	 * @param ageRatings
+	 * @param selectedMovie
+	 * @param userAge
+	 * @return true if old enough, false if not
+	 */
+	private static boolean isOldEnough(int[] ageRatings, int selectedMovie, int userAge) {
+		int[] ratings = ageRatings;
+		if (userAge >= ratings[selectedMovie]) {
+			return true;
+		} else return false;		
+	}
+
+	
+	// METHODS
 	
 	/**
 	 * Check wheter or not the given password is valid
@@ -111,11 +121,16 @@ public class Tickets {
 		boolean noWhite = noWhiteSpace(password);
 		boolean isOver = isOverEight(password);
 		if (noWhite && isOver) {
-			System.out.println("Salasana hyväksytty!");
+			System.out.println("Password accepted!");
 			return true;
 		} else return false;
 	}
 
+	/**
+	 * Checks if the given password is atleast 8 characters long
+	 * @param mj
+	 * @return true if it is, otherwise false
+	 */
 	public static boolean isOverEight(String mj) {
 		if (mj.length() < 8) {
 			System.out.println("Password must be over 8 characters!");
@@ -123,6 +138,11 @@ public class Tickets {
 		} else return true;
 	}
 	
+	/**
+	 * Checks if the given password contains whitespaces which are not allowed
+	 * @param password
+	 * @return true if no whitespaces, otherwise false
+	 */
 	private static boolean noWhiteSpace(String password) {
 		int whitespaces = 0;
 		for (int i = 0; i < password.length(); i++) {
@@ -137,7 +157,6 @@ public class Tickets {
 		} else return true;
 	}
 
-
 	/**
 	 * Takes movies arraylist and prints it's content to the user
 	 * @param movies
@@ -147,7 +166,6 @@ public class Tickets {
 			System.out.println(movie);
 		}		
 	}
-
 
 	/**
 	 * Reads lines from textfiles
@@ -166,34 +184,6 @@ public class Tickets {
 		return lines;
 	}
 
-
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-/*private static boolean askAdmin() {
-String username = "admin";
-String password = "admin";
-System.out.println("Syötä käyttäjätunnus: ");
-String inputtedUsername = reader.nextLine();
-System.out.println("Syötä salasana: ");
-String inputtedPassword = reader.nextLine();
-
-if (username.equals(inputtedUsername) && password.equals(inputtedPassword)) {
-	return true;
-} else {
-	System.out.println("Väärät tunnukset!");
-	return false;
-}
-}*/
