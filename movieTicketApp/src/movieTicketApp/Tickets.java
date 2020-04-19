@@ -81,8 +81,8 @@ public class Tickets {
 				if (askConfirmation.equals("y")) {
 					if (isOldEnough(ageRatings, selectedMovie, userAge)) {
 						System.out.println("tickets booked");
-					} else System.out.printf("You are not old enough,!"
-							+ " Age rating for this movie is %d", ageRatings[selectedMovie]);
+					} else System.out.printf("You are not old enough,"
+							+ " age rating for this movie is %d", ageRatings[selectedMovie]);
 				} 
 				else if (askConfirmation.equals("n")) {
 					System.out.println("tickets not booked");
