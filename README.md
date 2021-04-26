@@ -1,2 +1,5 @@
-# movie_ticket_booking_app
- Text based application for simple movie ticket bookings developed by Karel Haapasalo
+# About
+
+Console based application for booking movie tickets. Made with Java.
+Done as a part of school course's final project.
+Author: Karel Haapasalo.
